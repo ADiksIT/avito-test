@@ -1,6 +1,8 @@
 import React from 'react';
-import './App.css';
 import {Modal} from "./components/modal/Modal";
+import {API, Endpoints} from "./api/endpoints";
+import {fetchData} from "./api";
+import './App.css';
 
 interface IImage {
   id: number
@@ -25,23 +27,24 @@ function App() {
   const [modalData, setModalData] = React.useState<IPost>({comments: [], id: 0, url: ""})
 
   React.useEffect(() => {
-    fetch('https://boiling-refuge-66454.herokuapp.com/images')
-      .then(res => res.json())
-      .then(res => setImages(res))
+    (async () => {
+      const { data } = await fetchData(API+Endpoints.IMAGES);
+      setImages(data)
+    })()
   }, [])
 
   React.useEffect(() => {
     if (currentPost !== 0) {
-      fetch(`https://boiling-refuge-66454.herokuapp.com/images/${currentPost}`)
-        .then(res => res.json())
-        .then(res => setModalData(res))
+      (async () => {
+        const { data } = await fetchData(API+Endpoints.IMAGES+'/' +currentPost)
+        setModalData(data)
+        setIsModal(true)
+      })()
     }
   }, [currentPost])
 
-  const postHandle = (id: number) => {
-    setCurrentPost(id)
-    setIsModal(true)
-  }
+  const postHandle = (id: number) => setCurrentPost(id)
+
 
   return (
     <div className="container">
